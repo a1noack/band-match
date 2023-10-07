@@ -1,8 +1,5 @@
 const stripe = require('stripe')
 
-const apiKey = '<pk_test_51Nyet8FSTpMtfSJnMFNRnK1SMKx28yj7DsxKdxf00cFrGxTdpA4jqwfJyNHQAjfTOsS9E03DfISUDZaKL6OhH9HO00FH7nCfVd>'
-const secretKey = '<sk_test_51Nyet8FSTpMtfSJng62XlvDYYrCckgqi4qZodyEweEfYZHH1967EhlkPooMdHzwgmeMNJnON7LLrDzHXKZmHS2Pj00tUNrZia6>'
-
 stripe.setApiKey(apiKey, secretKey)
 
 
