@@ -1,0 +1,5 @@
+// stripe_apiKey = '<pk_test_51Nyet8FSTpMtfSJnMFNRnK1SMKx28yj7DsxKdxf00cFrGxTdpA4jqwfJyNHQAjfTOsS9E03DfISUDZaKL6OhH9HO00FH7nCfVd>'
+// stripe_secretKey = '<sk_test_51Nyet8FSTpMtfSJng62XlvDYYrCckgqi4qZodyEweEfYZHH1967EhlkPooMdHzwgmeMNJnON7LLrDzHXKZmHS2Pj00tUNrZia6>'
+
+
+// const openai_key = "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"

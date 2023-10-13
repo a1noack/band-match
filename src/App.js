@@ -10,9 +10,9 @@ function App() {
   const [placeholder, setPlaceholder] = useState(
     "Search Bears with Paint Brushes the Starry Night, painted by Vincent Van Gogh.."
   );
-
+  const openai_key = "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"
   const openai = new OpenAI({
-    apiKey: key,
+    apiKey: openai_key,
     dangerouslyAllowBrowser: true
   });
 
