@@ -1,63 +1,68 @@
-import { OpenAI } from "openai";
-import { useState } from "react";
-import "./App.css";
+import React, { useState } from "react";
+import { auth, db } from "./firebase"
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
+function Signup() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [location, setLocation] = useState("");
+  const [accountType, setAccountType] = useState("")
 
-function App() {
-  const [prompt, setPrompt] = useState("");
-  const [result, setResult] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [placeholder, setPlaceholder] = useState(
-    "Search Bears with Paint Brushes the Starry Night, painted by Vincent Van Gogh.."
-  );
-  const openai_key = "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"
-  const openai = new OpenAI({
-    apiKey: openai_key,
-    dangerouslyAllowBrowser: true
-  });
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    try {
+      const { user } = await createUserWithEmailAndPassword(auth, email, password)
 
-  const generateImage = async () => {
-    setPlaceholder(`Search ${prompt}..`);
-    setLoading(true);
-    const res = await openai.images.generate({
-      prompt: prompt,
-      n: 1,
-      size: "512x512",
-    });
-    setLoading(false);
-    setResult(res.data[0].url);
+      await db.collection("users").doc(user.uid).set({
+        name,
+        location,
+        accountType
+      })
+    } catch (error) {
+      console.error("Error creating user", error.message)
+    }
   };
-  return (
-    <div className="app-main">
-      {loading ? (
-        <>
-          <h2>Generating..Please Wait..</h2>
-          <div class="lds-ripple">
-            <div></div>
-            <div></div>
-          </div>
-        </>
-      ) : (
-        <>
-          <h2>Generate an Image using Open AI API</h2>
 
-          <textarea
-            className="app-input"
-            placeholder={placeholder}
-            onChange={(e) => setPrompt(e.target.value)}
-            rows="10"
-            cols="40"
-          />
-          <button onClick={generateImage}>Generate an Image</button>
-          {result.length > 0 ? (
-            <img className="result-image" src={result} alt="result" />
-          ) : (
-            <></>
-          )}
-        </>
-      )}
+
+  return (
+    <div>
+      <h2>Create a Profile</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+            type="text"
+            placeholder="Name of band or venue"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+        />
+        <input
+            type="text"
+            placeholder="Email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+        />
+        <input
+            type="text"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+        />
+        <input
+            type="text"
+            placeholder="Venue or band"
+            value={accountType}
+            onChange={(e) => setAccountType(e.target.value)}
+        />
+        <input
+            type="text"
+            placeholder="Location"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+        />
+        <button type="submit">Submit</button>
+      </form>
     </div>
   );
 }
 
-export default App;
+export default Signup;
