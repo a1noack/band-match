@@ -1,28 +1,52 @@
 import React, { useState } from "react";
 import { auth, db } from "./firebase"
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 
 import './App.css';
+
+function App() {
+  return (
+    <Router>
+      <div>
+      <Routes>
+        <Route path={"/"} element={<Signup/>} />
+        <Route path={"/start"} element={<Start/>} />
+      </Routes>
+      </div>
+    </Router>
+  );
+}
+
+function Start() {
+  return (
+    <div>
+      <h2>Account Successfully Created!!</h2>
+    </div>
+  );
+}
 
 function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
-  const [accountType, setAccountType] = useState("")
+  const [accountType, setAccountType] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault()
     try {
       const { user } = await createUserWithEmailAndPassword(auth, email, password)
-
-      await db.collection("users").doc(user.uid).set({
-        name,
-        location,
-        accountType
-      })
+      navigate("/start");
+      // await db.collection("users").doc(user.uid).set({
+      //   name,
+      //   location,
+      //   accountType
+      // })
     } catch (error) {
       console.error("Error creating user", error.message)
+      navigate("/");
     }
   };
 
@@ -77,4 +101,4 @@ function Signup() {
   );
 }
 
-export default Signup;
+export { Signup, App };
