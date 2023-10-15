@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { auth, db } from "./firebase"
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
+import { collection } from "firebase/firestore";
 
 import './App.css';
 
@@ -11,18 +12,32 @@ function App() {
       <div>
       <Routes>
         <Route path={"/"} element={<Signup/>} />
-        <Route path={"/start"} element={<Start/>} />
+        <Route path={"/feed"} element={<Feed/>} />
       </Routes>
       </div>
     </Router>
   );
 }
 
-function Start() {
+function Feed() {
+  // const usersCollectionRef = collection(db, 'users');
+  // console.log(usersCollectionRef);
+  const [users, setUsers] = useState([
+    { id: 'doc1Id', name: 'Alice', info: 'Frontend Developer', email: 'alice@example.com' },
+    { id: 'doc2Id', name: 'Bob', info: 'Backend Developer', email: 'bob@example.com' },
+    // ... Additional users
+  ]);
+  const allUsers = users.concat(users, users, users, users, users, users, users, users, users, users);
   return (
-    <div>
-      <h2>Account Successfully Created!!</h2>
-    </div>
+      <div>
+        <h1>Suggested</h1>
+        {allUsers.map((user) => (
+            <div key={user.id}>
+                <h2>{user.name}</h2>
+                <p>{user.info}</p>
+            </div>
+        ))}
+      </div>
   );
 }
 
@@ -38,7 +53,7 @@ function Signup() {
     event.preventDefault()
     try {
       const { user } = await createUserWithEmailAndPassword(auth, email, password)
-      navigate("/start");
+      navigate("/feed");
       // await db.collection("users").doc(user.uid).set({
       //   name,
       //   location,
@@ -101,4 +116,4 @@ function Signup() {
   );
 }
 
-export { Signup, App };
+export { Feed, App };
