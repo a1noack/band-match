@@ -48,22 +48,30 @@ function Feed() {
   if (!user) {
     return (
       <div>
-        <Navbar />
-        <h1>Not logged in</h1>
+        <div>
+          <Navbar />
+        </div>
+        <div className="content-container">
+          <h1>Not logged in</h1>
+        </div>
       </div>);
   }
 
   // If a user is logged in, show users
   return (
       <div>
-        <Navbar />
-        <h1>Suggested</h1>
-        {allUsers.map((user) => (
-            <div key={user.id}>
-                <h2>{user.name}</h2>
-                <p>{user.info}</p>
-            </div>
-        ))}
+        <div>
+          <Navbar />
+        </div>
+        <div className="content-container">
+          <h2>Suggested</h2>
+          {allUsers.map((user) => (
+              <div key={user.id}>
+                  <h4>{user.name}</h4>
+                  <p>{user.info}</p>
+              </div>
+          ))}
+        </div>
       </div>
   );
 }
@@ -91,34 +99,38 @@ function Signin() {
   
   return (
     <div>
-      <Navbar />
-      <h2 className={"App-header"}>Log in</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <input
-              type="text"
-              placeholder="Email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div>
-          <input
-              type="text"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <button type="submit">Submit</button>
-      </form>
-      {error && 
-        <div style={{ backgroundColor: '#ffe6e6', border: '1px solid red', padding: '10px', borderRadius: '4px', marginTop: '10px' }}>
-          <span style={{ color: 'red' }}>Invalid email/password combination
-          </span>
-          <button onClick={redirectToSignup} style={{ marginLeft: '10px' }}>Create account</button>
-        </div>
-      }
+      <div>
+        <Navbar />
+      </div>
+      <div className="content-container">
+        <h2 className={"App-header"}>Log in</h2>
+        <form onSubmit={handleSubmit}>
+          <div>
+            <input
+                type="text"
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div>
+            <input
+                type="text"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <button type="submit">Submit</button>
+        </form>
+        {error && 
+          <div style={{ backgroundColor: '#ffe6e6', border: '1px solid red', padding: '10px', borderRadius: '4px', marginTop: '10px' }}>
+            <span style={{ color: 'red' }}>Invalid email/password combination
+            </span>
+            <button onClick={redirectToSignup} style={{ marginLeft: '10px' }}>Create account</button>
+          </div>
+        }
+      </div>
     </div>
   );
 }
@@ -153,58 +165,62 @@ function Signup() {
 
   return (
     <div>
-      <Navbar />
-      <h2 className={"App-header"}>Create an Account</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <input
-              id="name"
-              type="text"
-              placeholder="Name of band or venue"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-          />
-        </div>
-        <div>
-          <input
-              type="text"
-              placeholder="Email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div>
-          <input
-              type="text"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-          />
-        </div>
-        <div>
-          <input
-              type="text"
-              placeholder="Venue or band"
-              value={accountType}
-              onChange={(e) => setAccountType(e.target.value)}
-          />
-        </div>
-        <div>
-          <input
-              type="text"
-              placeholder="Location"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-          />
-        </div>
-        <button type="submit">Submit</button>
-        <div>
-          <p>Already have an account?</p> 
-        </div>
-        <button onClick={redirectToLogin}>Log in</button>
-      </form>
+      <div>
+        <Navbar />
+      </div>
+      <div className="content-container">
+        <h2 className={"App-header"}>Create an Account</h2>
+        <form onSubmit={handleSubmit}>
+          <div>
+            <input
+                id="name"
+                type="text"
+                placeholder="Name of band or venue"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+          <div>
+            <input
+                type="text"
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div>
+            <input
+                type="text"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+          <div>
+            <input
+                type="text"
+                placeholder="Venue or band"
+                value={accountType}
+                onChange={(e) => setAccountType(e.target.value)}
+            />
+          </div>
+          <div>
+            <input
+                type="text"
+                placeholder="Location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+            />
+          </div>
+          <button type="submit">Submit</button>
+          <div>
+            <p>Already have an account?</p> 
+          </div>
+          <button onClick={redirectToLogin}>Log in</button>
+        </form>
+      </div>
+      </div>
       
-    </div>
   );
 }
 

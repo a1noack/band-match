@@ -13,6 +13,19 @@
   }
 }
 
+.content-container {
+  place-items: center;
+  height: calc(100vh - 60px); /* Adjust based on your navbar's height */
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  justify-content: center;
+}
+
+.content-container > .content {
+  transform: translateY(-50.33%);
+}
+
 .App-header {
   /*background-color: #282c34;*/
   /*min-height: 100vh;*/
@@ -41,14 +54,14 @@ body {
     margin: 0;
     height: 100vh;
     display: grid;
-    place-items: center;
+    /* place-items: center; */
     background-color: #f5f5f5; /* optional background color */
 }
 
 form {
-    width: 300px; /* or your desired width */
+    width: 300px;
     background-color: #fff; /* optional background color */
-    padding: 20px;
+    /* padding: 20px; */
     display: flex;
     flex-direction: column;
     align-items: center;
