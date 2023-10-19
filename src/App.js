@@ -3,6 +3,7 @@ import { auth, db } from "./firebase"
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
 import { collection } from "firebase/firestore";
+import Navbar from './components/Navbar';
 
 import './App.css';
 
@@ -47,6 +48,7 @@ function Feed() {
   if (!user) {
     return (
       <div>
+        <Navbar />
         <h1>Not logged in</h1>
       </div>);
   }
@@ -54,6 +56,7 @@ function Feed() {
   // If a user is logged in, show users
   return (
       <div>
+        <Navbar />
         <h1>Suggested</h1>
         {allUsers.map((user) => (
             <div key={user.id}>
@@ -88,6 +91,7 @@ function Signin() {
   
   return (
     <div>
+      <Navbar />
       <h2 className={"App-header"}>Log in</h2>
       <form onSubmit={handleSubmit}>
         <div>
@@ -149,6 +153,7 @@ function Signup() {
 
   return (
     <div>
+      <Navbar />
       <h2 className={"App-header"}>Create an Account</h2>
       <form onSubmit={handleSubmit}>
         <div>
