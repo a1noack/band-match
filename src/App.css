@@ -62,9 +62,37 @@ form {
     width: 300px;
     background-color: #fff; /* optional background color */
     /* padding: 20px; */
+    /* margin-top: 30px; */
+    padding-top: 20px;
+    padding-bottom: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
     border-radius: 8px; /* optional rounded corners */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* optional shadow */
+}
+
+.form-group {
+  margin-bottom: 10px;
+}
+
+.radio-group {
+  display: flex; /* Use flexbox to align elements horizontally */
+  align-items: center; /* Center align items vertically */
+  gap: 10px; /* Add some spacing between radio buttons and labels */
+}
+
+label {
+  display: block;
+  margin-bottom: 3px;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 7px;
+  font-size: 14px;
 }
