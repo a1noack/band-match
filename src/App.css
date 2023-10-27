@@ -19,6 +19,8 @@
   display: flex;
   flex-direction: column;
   /* align-items: center; */
+  flex-wrap: wrap;
+  gap: 16px;  /* Space between cards */
   justify-content: center;
 }
 
@@ -95,4 +97,19 @@ input[type="email"] {
   border: 1px solid #ccc;
   border-radius: 7px;
   font-size: 14px;
+}
+
+.card {
+  background-color: #f9f9f9; /* Light gray background */
+  padding: 20px;
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Simple shadow for depth */
+  width: 200px; /* Adjust based on your preference */
+  text-align: center;
+}
+
+/* Optional: Add hover effect */
+.card:hover {
+  background-color: #e6e6e6; /* Slightly darker background on hover */
+  cursor: pointer;
 }

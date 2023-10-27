@@ -3,10 +3,23 @@ import { auth, db, admin } from "./firebase"
 import { getAuth } from 'firebase/auth';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
-import { doc, setDoc, getDocs, collection } from "firebase/firestore";
+import { doc, setDoc, getDoc, getDocs, collection } from "firebase/firestore";
 import Navbar from './components/Navbar';
-
 import './App.css';
+
+
+const fetchDocuments = async () => {
+  const querySnapshot = await getDocs(collection(db, "users"));
+
+  const documents = querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    entity_name: doc.data().name,
+    entity_email: doc.data().email,
+    entity_type: doc.data().accountType,
+  }));
+  console.log(documents);
+  return documents;
+}
 
 function App() {
   return (
@@ -24,6 +37,8 @@ function App() {
 
 function Feed() {
   const [user, setUser] = useState(null);
+  const [userType, setUserType] = useState(null); // TODO: Use this to determine what to show on the feed
+  const [documents, setDocuments] = useState([]);
 
   // Listener that checks if a user is logged in
   useEffect(() => {
@@ -39,27 +54,31 @@ function Feed() {
     return () => unsubscribe();
   }, []);
 
-  const querySnapshot = getDocs(collection(db, "users"));
-  const userList = document.getElementById("userList"); // Assuming you have a <ul> element with id "userList" in your HTML
+  useEffect(() => {
+    const getAndSetDocuments = async () => {
+        try {
+          const docs = await fetchDocuments();
+          // const docRef = doc(db, "users", user.uid);
+          // const docSnap = await getDoc(docRef);
+          // console.log(docSnap.data());
+          // for (const doc of docs) {
+          //     if (doc.id === user.uid) {
+          //         setUserType(doc.entity_type);
+          //     }
+          // }
+          // console.log("User type:", userType);
+          // const filteredDocuments = docs.filter(doc => doc.entity_type !== userType);
+          // setDocuments(filteredDocuments);
+          setDocuments(docs);
+        } catch (error) {
+            console.error("Error fetching documents:", error);
+        }
+    };
+    getAndSetDocuments();
+  }, [userType !== null]);
 
-  querySnapshot.forEach((doc) => {
-    // const userData = doc.data();
-  
-    // // Create a new list item for each user
-    // const listItem = document.createElement("li");
-    // listItem.textContent = `Name: ${userData.name}, Email: ${userData.email}`;
-    
-    // // Append the list item to the user list
-    // userList.appendChild(listItem);
-  });
-
-  // querySnapshot.forEach((doc) => {
-  //   // doc.data() is never undefined for query doc snapshots
-  //   console.log(doc.id, " => ", doc.data());
-  // });
-
-  // If a user is not logged in, don't show users
-  if (!user) {
+  //If a user is not logged in, don't show users
+  if (user === null) {
     return (
       <div>
         <div>
@@ -70,22 +89,22 @@ function Feed() {
         </div>
       </div>);
   }
-
-  // If a user is logged in, show users
-  return (
+  else {
+    return (
       <div>
         <div>
           <Navbar />
         </div>
-        <ul id="userList">
-          {/* {querySnapshot.forEach((doc) => {
-            // doc.data() is never undefined for query doc snapshots
-            console.log(doc.id, " => ", doc.data());
-            <li>{doc.id}</li>
-          })} */}
-        </ul>
+        <div className="content-container">
+          {documents.map(doc => (
+            <div key={doc.id} className="card">
+                {doc.entity_name}
+            </div>
+          ))}
+        </div>
       </div>
-  );
+    );
+  }
 }
 
 function Signin() {
@@ -117,10 +136,10 @@ function Signin() {
       <div className="content-container">
         <h2 className={"App-header"}>Log in</h2>
         <form onSubmit={handleSubmit}>
-          <div>
+          <div>  
             <input
                 type="text"
-                placeholder="Email address"
+                placeholder="Email address"// TODO: Switch to same format as signup
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
             />
@@ -129,7 +148,7 @@ function Signin() {
             <input
                 type="text"
                 placeholder="Password"
-                value={password}
+                value={password}  // TODO: Make it so that this is hidden
                 onChange={(e) => setPassword(e.target.value)}
             />
           </div>
