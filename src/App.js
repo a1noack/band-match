@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-route
 import { doc, setDoc, getDoc, getDocs, collection } from "firebase/firestore";
 import Navbar from './components/Navbar';
 import './App.css';
-
+import { getStorage, ref, uploadBytes } from "firebase/storage";
 
 const fetchDocuments = async () => {
   const querySnapshot = await getDocs(collection(db, "users"));
@@ -38,6 +38,32 @@ function App() {
 
 function Profile() {
   const [user, setUser] = useState(null);
+  const [file, setFile] = useState(null);
+  const storage = getStorage();
+
+  const handleFileChange = (e) => {
+    console.log("File changed");
+    const selectedFile = e.target.files[0];
+    setFile(selectedFile);
+    console.log("Selected file:", selectedFile);
+    uploadToFirebase();
+  };
+
+  const uploadToFirebase = () => {
+    console.log("Uploading to Firebase");
+    if (!file) return;
+
+    const fileRef = ref(storage, 'images/mountains.jpg');
+
+    uploadBytes(fileRef, file).then((snapshot) => {
+      console.log('Uploaded a blob or file!');
+    });
+  };
+
+  // const userRef = firestore.collection('users').doc(user.uid);
+  // userRef.update({
+  //   profilePicture: downloadURL
+  // });
 
   // Listener that checks if a user is logged in
   useEffect(() => {
@@ -73,7 +99,8 @@ function Profile() {
         </div>
         <div className="content-container">
           <h1>Profile</h1>
-          <p>Name: {user.displayName}</p>
+          <input type="file" onChange={handleFileChange} />
+          <p>Name: {user.name}</p>
           <p>Email: {user.email}</p>
         </div>
       </div>
@@ -177,6 +204,7 @@ function Signin() {
   }
   
   return (
+    // TODO: forward errors to the user eg. "Invalid email/password combination"
     <div>
       <div>
         <Navbar />
@@ -187,7 +215,7 @@ function Signin() {
           <div>  
             <input
                 type="text"
-                placeholder="Email address"// TODO: Switch to same format as signup
+                placeholder="Email address"  // TODO: Switch to same format as signup
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
             />
