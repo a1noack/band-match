@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { auth } from "../firebase"
 import './Navbar.css'
 import 'font-awesome/css/font-awesome.min.css';
+import personImage from '../person.png';
 
 const Navbar = () => {
   const [showNavbar, setShowNavbar] = useState(false)
@@ -26,6 +27,16 @@ const Navbar = () => {
     setShowNavbar(!showNavbar)
   }
 
+  const handleLogout = () => {
+    auth.signOut()
+      .then(() => {
+        console.log("User logged out");
+      })
+      .catch(error => {
+        console.error("Error logging out:", error);
+      });
+  };
+
   return (
     <nav className="navbar">
       <div className="container">
@@ -43,7 +54,12 @@ const Navbar = () => {
           </ul>
         </div>
         <div style={{ marginLeft: 'auto' }}>  {/* This pushes the subsequent content to the right */}
-          {user ? <img src="../logo.svg" alt="My Image" className='profile'/>  : null}  {/* Show user icon if user is logged in */}
+          {user ? (
+            <>
+              <button onClick={handleLogout}>Log Out</button>
+              <img src={personImage} alt="My Image" className='profile'/>
+            </>
+          ) : null}
         </div>
       </div>
     </nav>
