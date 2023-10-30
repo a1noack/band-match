@@ -29,10 +29,56 @@ function App() {
         <Route path={"/"} element={<Signup/>} />
         <Route path={"/signin"} element={<Signin/>} />
         <Route path={"/feed"} element={<Feed/>} />
+        <Route path={"/profile"} element={<Profile/>} />
       </Routes>
       </div>
     </Router>
   );
+}
+
+function Profile() {
+  const [user, setUser] = useState(null);
+
+  // Listener that checks if a user is logged in
+  useEffect(() => {
+    // console.log("Auth state changed:", user);
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if (user) {
+        setUser(user);
+      } else {
+        setUser(null);
+      }
+    });
+
+    // Cleanup the subscription
+    return () => unsubscribe();
+  }, []);
+
+  if (user === null) {
+    return (
+      <div>
+        <div>
+          <Navbar />
+        </div>
+        <div className="content-container">
+          <h1>Not logged in</h1>
+        </div>
+      </div>);
+  }
+  else {
+    return (
+      <div>
+        <div>
+          <Navbar />
+        </div>
+        <div className="content-container">
+          <h1>Profile</h1>
+          <p>Name: {user.displayName}</p>
+          <p>Email: {user.email}</p>
+        </div>
+      </div>
+    );
+  }
 }
 
 function Feed() {
@@ -42,6 +88,7 @@ function Feed() {
 
   // Listener that checks if a user is logged in
   useEffect(() => {
+    // console.log("Auth state changed:", user);
     const unsubscribe = auth.onAuthStateChanged(user => {
       if (user) {
         setUser(user);
@@ -55,6 +102,7 @@ function Feed() {
   }, []);
 
   useEffect(() => {
+    // console.log("Auth state changed:", user);
     const getAndSetDocuments = async () => {
         try {
           const docs = await fetchDocuments();
