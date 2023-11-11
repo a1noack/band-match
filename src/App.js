@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { auth, db, admin } from "./firebase"
-import { getAuth } from 'firebase/auth';
+import { auth, db } from "./firebase"
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
-import { doc, setDoc, getDoc, getDocs, collection } from "firebase/firestore";
+import { doc, setDoc, getDocs, collection, updateDoc } from "firebase/firestore";
 import Navbar from './components/Navbar';
 import './App.css';
-import { getStorage, ref, uploadBytes } from "firebase/storage";
+import { getStorage, ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 
 const fetchDocuments = async () => {
   const querySnapshot = await getDocs(collection(db, "users"));
@@ -38,47 +37,76 @@ function App() {
 
 function Profile() {
   const [user, setUser] = useState(null);
-  const [file, setFile] = useState(null);
   const storage = getStorage();
 
-  const handleFileChange = (e) => {
-    console.log("File changed");
-    const selectedFile = e.target.files[0];
-    setFile(selectedFile);
-    console.log("Selected file:", selectedFile);
-    uploadToFirebase();
-  };
-
-  const uploadToFirebase = () => {
-    console.log("Uploading to Firebase");
-    if (!file) return;
-
-    const fileRef = ref(storage, 'images/mountains.jpg');
-
-    uploadBytes(fileRef, file).then((snapshot) => {
-      console.log('Uploaded a blob or file!');
-    });
-  };
-
-  // const userRef = firestore.collection('users').doc(user.uid);
-  // userRef.update({
-  //   profilePicture: downloadURL
-  // });
-
-  // Listener that checks if a user is logged in
   useEffect(() => {
-    // console.log("Auth state changed:", user);
-    const unsubscribe = auth.onAuthStateChanged(user => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-      }
+    const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+      setUser(firebaseUser);
     });
 
-    // Cleanup the subscription
     return () => unsubscribe();
   }, []);
+
+  // Make sure to define this function before it is used
+  const uploadToFirebase = async (fileToUpload) => {
+    console.log("Uploading to Firebase");
+    if (!fileToUpload) return;
+
+    // Generate a unique file name or path here
+    const fileRef = ref(storage, `images/${fileToUpload.name}`);
+
+    try {
+      // uploadBytesResumable returns an upload task
+      const uploadTask = uploadBytesResumable(fileRef, fileToUpload);
+
+      // Use a promise to handle completion
+      return new Promise((resolve, reject) => {
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            // Handle progress
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log('Upload is ' + progress + '% done');
+          },
+          (error) => {
+            // Handle unsuccessful uploads
+            console.error('Error during upload', error);
+            reject(error);
+          },
+          () => {
+            // Handle successful uploads on complete
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+              console.log('File available at', downloadURL);
+              resolve(downloadURL);
+            });
+          }
+        );
+      });
+    } catch (error) {
+      console.error('Error uploading file', error);
+      return null;
+    }
+  };
+
+  const handleFileChange = async (e) => {
+    console.log("File changed");
+    const selectedFile = e.target.files[0];
+    console.log("Selected file:", selectedFile);
+
+    try {
+      const imageURL = await uploadToFirebase(selectedFile); // Pass the file directly
+      console.log("Image URL:", imageURL);
+      if (user && imageURL) {
+        const userRef = doc(db, "users", user.uid);
+        console.log("userRef:", userRef);
+        await updateDoc(userRef, {
+          profileImage: imageURL
+        });
+      }
+    } catch (error) {
+      console.error('Error updating user profile image', error);
+    }
+  };
 
   if (user === null) {
     return (
@@ -99,7 +127,7 @@ function Profile() {
         </div>
         <div className="content-container">
           <h1>Profile</h1>
-          <input type="file" onChange={handleFileChange} />
+          <p><input type="file" onChange={handleFileChange} /></p>
           <p>Name: {user.name}</p>
           <p>Email: {user.email}</p>
         </div>
@@ -129,21 +157,9 @@ function Feed() {
   }, []);
 
   useEffect(() => {
-    // console.log("Auth state changed:", user);
     const getAndSetDocuments = async () => {
         try {
           const docs = await fetchDocuments();
-          // const docRef = doc(db, "users", user.uid);
-          // const docSnap = await getDoc(docRef);
-          // console.log(docSnap.data());
-          // for (const doc of docs) {
-          //     if (doc.id === user.uid) {
-          //         setUserType(doc.entity_type);
-          //     }
-          // }
-          // console.log("User type:", userType);
-          // const filteredDocuments = docs.filter(doc => doc.entity_type !== userType);
-          // setDocuments(filteredDocuments);
           setDocuments(docs);
         } catch (error) {
             console.error("Error fetching documents:", error);
@@ -247,8 +263,7 @@ function Signup() {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
-  // const [accountType, setAccountType] = useState("");
-  const [accountType, setAccountType] = useState('band'); // Default value
+  const [accountType, setAccountType] = useState('band');
 
   const handleRadioChange = (e) => {
     setAccountType(e.target.value);
@@ -268,7 +283,8 @@ function Signup() {
         name: name,
         email: email,
         accountType: accountType,
-        location: location
+        location: location,
+        profileImage: null,
       });
     } catch (error) {
       console.error("Error creating user", error.message)
