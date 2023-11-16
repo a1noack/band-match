@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { auth, db } from "./firebase"
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
-import { doc, setDoc, getDocs, collection, updateDoc } from "firebase/firestore";
+import { doc, setDoc, getDocs, collection, updateDoc, getDoc } from "firebase/firestore";
+// import { useUserProfile } from ".GetUserHook.js"
 import Navbar from './components/Navbar';
 import './App.css';
 import { getStorage, ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
@@ -37,15 +38,31 @@ function App() {
 
 function Profile() {
   const [user, setUser] = useState(null);
+  const [name, setName] = useState(null);
+  const [profileImage, setProfileImage] = useState(null);
   const storage = getStorage();
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((firebaseUser) => {
+    const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
       setUser(firebaseUser);
+      if (firebaseUser) {
+        const userRef = doc(db, 'users', firebaseUser.uid);
+        try {
+          const userDoc = await getDoc(userRef);
+          if (userDoc.exists()) {
+            setProfileImage(userDoc.data().profileImage);
+            setName(userDoc.data().name);
+          } else {
+            console.log('User document not found');
+          }
+        } catch (error) {
+          console.error('Error fetching user document:', error);
+        }
+      }
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [db]);  // Every time the database is updated, rerun this function.
 
   // Make sure to define this function before it is used
   const uploadToFirebase = async (fileToUpload) => {
@@ -126,9 +143,10 @@ function Profile() {
           <Navbar />
         </div>
         <div className="content-container">
-          <h1>Profile</h1>
+          {profileImage && <img src={profileImage} alt="Profile" className="profilelarge"/>}
+          <></>
           <p><input type="file" onChange={handleFileChange} /></p>
-          <p>Name: {user.name}</p>
+          <p>Name: {name}</p>
           <p>Email: {user.email}</p>
         </div>
       </div>
