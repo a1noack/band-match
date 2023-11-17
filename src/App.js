@@ -145,7 +145,7 @@ function Profile() {
         <div className="content-container">
           {profileImage && <img src={profileImage} alt="Profile" className="profilelarge"/>}
           <></>
-          <p><input type="file" onChange={handleFileChange} /></p>
+          <p>Change profile photo:<input type="file" onChange={handleFileChange} /></p>
           <p>Name: {name}</p>
           <p>Email: {user.email}</p>
         </div>
@@ -162,9 +162,21 @@ function Feed() {
   // Listener that checks if a user is logged in
   useEffect(() => {
     // console.log("Auth state changed:", user);
-    const unsubscribe = auth.onAuthStateChanged(user => {
+    const unsubscribe = auth.onAuthStateChanged(async user => {
       if (user) {
         setUser(user);
+        const userRef = doc(db, 'users', user.uid);
+        try {
+          const userDoc = await getDoc(userRef);
+          if (userDoc.exists()) {
+            setUserType(userDoc.data().accountType);
+            console.log('USERTYPE = ', userDoc.data().accountType)
+          } else {
+            console.log('User document not found');
+          }
+        } catch (error) {
+          console.error('Error fetching user document:', error);
+        }
       } else {
         setUser(null);
       }
@@ -205,7 +217,7 @@ function Feed() {
           <Navbar />
         </div>
         <div className="content-container">
-          {documents.map(doc => (
+          {documents.filter(doc => doc.entity_type !== userType).map(doc => (
             <div key={doc.id} className="card">
                 {doc.entity_name}
             </div>
