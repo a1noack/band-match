@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { auth, db } from "./firebase"
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { BrowserRouter as Router, Route, Routes, useNavigate } from 'react-router-dom';
-import { doc, setDoc, getDocs, collection, updateDoc, getDoc } from "firebase/firestore";
+import { BrowserRouter as Router, Route, Routes, useNavigate, Link, useParams } from 'react-router-dom';
+import { doc, setDoc, getDocs, collection, updateDoc, getDoc, arrayUnion } from "firebase/firestore";
 // import { useUserProfile } from ".GetUserHook.js"
 import Navbar from './components/Navbar';
 import './App.css';
@@ -30,6 +30,7 @@ function App() {
         <Route path={"/signin"} element={<Signin/>} />
         <Route path={"/feed"} element={<Feed/>} />
         <Route path={"/profile"} element={<Profile/>} />
+        <Route path={"/users/:otherId"} element={<ProfilePage />} />
       </Routes>
       </div>
     </Router>
@@ -229,13 +230,112 @@ function Feed() {
           </h1>
           {documents.filter(doc => doc.entity_type !== userType).map(doc => (
             <div key={doc.id} className="card">
-                {doc.entity_name}
+                {/* {doc.entity_name} */}
+                <Link to={`/users/:${doc.id}`}>{doc.entity_name}</Link>
             </div>
           ))}
         </div>
       </div>
     );
   }
+}
+
+function ProfilePage() {
+  const { otherId } = useParams();  // get the param from the url
+  const [otherData, setOtherData] = useState(null);
+  const [user, setUser] = useState(null);
+  const [userType, setUserType] = useState(null); // TODO: Use this to determine what to show on the feed
+
+  useEffect(() => {
+    const fetchOtherData = async () => {
+      try {
+        const docRef = doc(db, 'users', otherId.slice(1));
+        const docSnap = await getDoc(docRef);
+
+        console.log("docSnap = ", docSnap);
+        console.log("otherId = ", otherId);
+
+        if (docSnap.exists()) {
+          setOtherData(docSnap.data());
+        } else {
+          console.log("No such user!");
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchOtherData();
+  }, [otherId, db]);
+
+  // Listener that checks if a user is logged in
+  useEffect(() => {
+    // console.log("Auth state changed:", user);
+    const unsubscribe = auth.onAuthStateChanged(async user => {
+      if (user) {
+        setUser(user);
+        const userRef = doc(db, 'users', user.uid);
+        try {
+          const userDoc = await getDoc(userRef);
+          if (userDoc.exists()) {
+            setUserType(userDoc.data().accountType);
+            console.log('USERTYPE = ', userDoc.data().accountType)
+          } else {
+            console.log('User document not found');
+          }
+        } catch (error) {
+          console.error('Error fetching user document:', error);
+        }
+      } else {
+        setUser(null);
+      }
+    });
+
+    // Cleanup the subscription
+    return () => unsubscribe();
+  }, [db]);
+
+  const addToVisited = async () => {
+    if (!user) {
+      console.error("No user logged in");
+      return;
+    }
+    const otherRef = doc(db, 'users', otherId.slice(1)); // Ensure the ID is correctly formatted
+    try {
+      await updateDoc(otherRef, {
+        visited: arrayUnion(user.uid)
+      });
+      console.log("User ID added to visited");
+    } catch (error) {
+      console.error("Error updating visited array", error);
+    }
+  }
+
+  if (!otherData) {
+    return <div>Loading...</div>;
+  }
+
+  console.log('visited: ', otherData.visited);
+
+  return (
+    <div>
+      <Navbar />
+      <div className="content-container">
+        <h1>{"Venue's Name: " + otherData.name}</h1>
+        <p>{"Venue's email: " + otherData.email}</p>
+        <p>Bands that have played here:</p>
+        <ul>
+          {otherData.visited.map((id, index) => (
+            <li key={index}>
+              <Link to={`/users/:${id}`}>{id}</Link> {/* Removed the colon in the URL */}
+            </li>
+          ))}
+        </ul>
+        <button onClick={addToVisited} style={{ marginLeft: '10px' }}>I've played here!</button>
+        {/* You can conditionally display band or venue-specific information based on userData.accountType */}
+      </div>
+    </div>
+  );
 }
 
 function Signin() {
@@ -325,6 +425,7 @@ function Signup() {
         accountType: accountType,
         location: location,
         profileImage: null,
+        visited: []
       });
     } catch (error) {
       console.error("Error creating user", error.message)
