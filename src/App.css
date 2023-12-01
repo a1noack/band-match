@@ -18,7 +18,7 @@
   height: calc(100vh - 60px); /* Adjust based on your navbar's height */
   display: flex;
   flex-direction: column;
-  /* align-items: center; */
+  align-items: center;
   flex-wrap: wrap;
   gap: 16px;  /* Space between cards */
   justify-content: center;
@@ -112,4 +112,11 @@ input[type="email"] {
 .card:hover {
   background-color: #e6e6e6; /* Slightly darker background on hover */
   cursor: pointer;
+}
+
+.profilelarge {
+  width: 100px;
+  height: 100px;
+  /* margin-right: 20px;
+  margin-top: 10px; */
 }

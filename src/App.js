@@ -158,6 +158,7 @@ function Feed() {
   const [user, setUser] = useState(null);
   const [userType, setUserType] = useState(null); // TODO: Use this to determine what to show on the feed
   const [documents, setDocuments] = useState([]);
+  const [oppositeType, setOppositeType] = useState(null);
 
   // Listener that checks if a user is logged in
   useEffect(() => {
@@ -170,6 +171,12 @@ function Feed() {
           const userDoc = await getDoc(userRef);
           if (userDoc.exists()) {
             setUserType(userDoc.data().accountType);
+            if (userDoc.data().accountType == "band") {
+              setOppositeType("Venues");
+            }
+            else {
+              setOppositeType("Bands");
+            }
             console.log('USERTYPE = ', userDoc.data().accountType)
           } else {
             console.log('User document not found');
@@ -217,6 +224,9 @@ function Feed() {
           <Navbar />
         </div>
         <div className="content-container">
+          <h1>
+            {oppositeType + " In Your Area"}
+          </h1>
           {documents.filter(doc => doc.entity_type !== userType).map(doc => (
             <div key={doc.id} className="card">
                 {doc.entity_name}
