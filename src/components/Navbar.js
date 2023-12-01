@@ -1,19 +1,41 @@
 import { useState, useEffect } from 'react'
-import { NavLink } from 'react-router-dom'
-import { auth } from "../firebase"
+import { NavLink, Link } from 'react-router-dom'
+import { db, auth } from "../firebase"
 import './Navbar.css'
 import 'font-awesome/css/font-awesome.min.css';
-import personImage from '../person.png';
+import defaultProfileImage from '../defaultProfileImage.png'
+import { getDoc, doc } from 'firebase/firestore';
 
 const Navbar = () => {
   const [showNavbar, setShowNavbar] = useState(false)
   const [user, setUser] = useState(null);
+  const [profileImage, setProfileImage] = useState(null);
 
   // Listener that checks if a user is logged in
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(user => {
+    const unsubscribe = auth.onAuthStateChanged(async user => {
       if (user) {
         setUser(user);
+        const userRef = doc(db, 'users', user.uid);
+        try {
+          const userDoc = await getDoc(userRef);
+          if (userDoc.exists()) {
+            const tmp = userDoc.data().profileImage;
+            console.log('tmp = ', tmp);
+            if (tmp === null) {
+              setProfileImage(defaultProfileImage);
+            }
+            else {
+              setProfileImage(tmp);
+            }
+            console.log('User profile photo found!');
+            console.log('profileImage = ', profileImage)
+          } else {
+            console.log('User profile photo not found');
+          }
+        } catch (error) {
+          console.error('Error fetching user document:', error);
+        }
       } else {
         setUser(null);
       }
@@ -21,11 +43,7 @@ const Navbar = () => {
 
     // Cleanup the subscription
     return () => unsubscribe();
-  }, []);
-
-  const handleShowNavbar = () => {
-    setShowNavbar(!showNavbar)
-  }
+  }, [db]);
 
   const handleLogout = () => {
     auth.signOut()
@@ -57,7 +75,11 @@ const Navbar = () => {
           {user ? (
             <>
               <button onClick={handleLogout}>Log Out</button>
-              <img src={personImage} alt="My Image" className='profile'/>
+              {profileImage &&
+                <Link to="/profile">
+                  <img src={profileImage} alt="Default Profile" className='profile'/>
+                </Link>             
+              }
             </>
           ) : null}
         </div>
