@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react'
-import { NavLink, Link } from 'react-router-dom'
-import { db, auth } from "../firebase"
-import './Navbar.css'
+import { useState, useEffect } from 'react';
+import { NavLink, Link } from 'react-router-dom';
+import { db, auth } from "../firebase";
+import './Navbar.css';
 import 'font-awesome/css/font-awesome.min.css';
-import defaultProfileImage from '../defaultProfileImage.png'
+import defaultProfileImage from '../defaultProfileImage.png';
 import { getDoc, doc } from 'firebase/firestore';
 
 const Navbar = () => {
