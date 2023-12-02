@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
-import { NavLink, Link, useNavigate } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { db, auth } from "../firebase";
 import './Navbar.css';
 import 'font-awesome/css/font-awesome.min.css';
 import defaultProfileImage from '../defaultProfileImage.png';
 import { getDoc, doc } from 'firebase/firestore';
+import logo from '../bandmatch.png'; // Import the logo image
+
 
 const Navbar = () => {
   const [showNavbar, setShowNavbar] = useState(false)
   const [user, setUser] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
-  const navigate = useNavigate();
+
 
   // Listener that checks if a user is logged in
   useEffect(() => {
@@ -46,45 +48,36 @@ const Navbar = () => {
     return () => unsubscribe();
   }, [db]);
 
-  const handleLogout = () => {
-    auth.signOut()
-      .then(() => {
-        console.log("User logged out");
-        navigate("/signin");
-      })
-      .catch(error => {
-        console.error("Error logging out:", error);
-      });
-  };
-
   return (
     <nav className="navbar">
       <div className="container">
         <div className={`nav-elements  ${showNavbar && 'active'}`}>
-          <ul>
             {user && (
               <>
-              <li>
-                <NavLink to="/feed">Venues</NavLink>
-              </li>
+                <NavLink className="link" to="/feed">
+                <div className="navbar-centered">
+                  <img src={logo} alt="BandMatch Logo" className='navbar-logo'/>
+                  <h1>BandMatch</h1>
+                </div>
+                </NavLink>
               </>
             )}
             {!user && (
-              <>
-                <li>
-                  <NavLink to="/">Create Account</NavLink>
-                </li>
-                <li>
-                  <NavLink to="/signin">Log In</NavLink>
-                </li>
-              </>
+              <ul>
+                <>
+                  <li>
+                    <NavLink to="/">Create Account</NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/signin">Log In</NavLink>
+                  </li>
+                </>
+              </ul>
             )}
-          </ul>
         </div>
         <div style={{ marginLeft: 'auto' }}>  {/* This pushes the subsequent content to the right */}
           {user ? (
             <>
-              <button onClick={handleLogout}>Log Out</button>
               {profileImage &&
                 <Link to="/profile">
                   <img src={profileImage} alt="Default Profile" className='profile'/>
