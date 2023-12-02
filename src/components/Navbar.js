@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { db, auth } from "../firebase";
 import './Navbar.css';
 import 'font-awesome/css/font-awesome.min.css';
@@ -10,6 +10,7 @@ const Navbar = () => {
   const [showNavbar, setShowNavbar] = useState(false)
   const [user, setUser] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
+  const navigate = useNavigate();
 
   // Listener that checks if a user is logged in
   useEffect(() => {
@@ -49,6 +50,7 @@ const Navbar = () => {
     auth.signOut()
       .then(() => {
         console.log("User logged out");
+        navigate("/signin");
       })
       .catch(error => {
         console.error("Error logging out:", error);
@@ -60,15 +62,23 @@ const Navbar = () => {
       <div className="container">
         <div className={`nav-elements  ${showNavbar && 'active'}`}>
           <ul>
-            <li>
-              <NavLink to="/feed">Feed</NavLink>
-            </li>
-            <li>
-              <NavLink to="/">Create Account</NavLink>
-            </li>
-            <li>
-              <NavLink to="/signin">Log In</NavLink>
-            </li>
+            {user && (
+              <>
+              <li>
+                <NavLink to="/feed">Venues</NavLink>
+              </li>
+              </>
+            )}
+            {!user && (
+              <>
+                <li>
+                  <NavLink to="/">Create Account</NavLink>
+                </li>
+                <li>
+                  <NavLink to="/signin">Log In</NavLink>
+                </li>
+              </>
+            )}
           </ul>
         </div>
         <div style={{ marginLeft: 'auto' }}>  {/* This pushes the subsequent content to the right */}

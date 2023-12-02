@@ -31,6 +31,7 @@ body {
     height: 40px;
     margin-right: 20px;
     margin-top: 10px;
+    border-radius: 50%; /* Makes the image circular */
 }
 
 .menu-icon {
