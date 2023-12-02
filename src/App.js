@@ -24,7 +24,7 @@ const fetchDocuments = async () => {
 function App() {
   return (
     <Router>
-      <div>
+      <Navbar/>
       <Routes>
         <Route path={"/"} element={<Signup/>} />
         <Route path={"/signin"} element={<Signin/>} />
@@ -32,7 +32,6 @@ function App() {
         <Route path={"/profile"} element={<Profile/>} />
         <Route path={"/users/:otherId"} element={<ProfilePage />} />
       </Routes>
-      </div>
     </Router>
   );
 }
@@ -41,9 +40,11 @@ function Profile() {
   const [user, setUser] = useState(null);
   const [name, setName] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
+  const [loading, setLoading] = useState(true);
   const storage = getStorage();
 
   useEffect(() => {
+    setLoading(true);
     const unsubscribe = auth.onAuthStateChanged(async (firebaseUser) => {
       setUser(firebaseUser);
       if (firebaseUser) {
@@ -60,10 +61,11 @@ function Profile() {
           console.error('Error fetching user document:', error);
         }
       }
+      setLoading(false);
     });
 
     return () => unsubscribe();
-  }, [db]);  // Every time the database is updated, rerun this function.
+  }, []);  // Every time the database is updated, rerun this function.
 
   // Make sure to define this function before it is used
   const uploadToFirebase = async (fileToUpload) => {
@@ -125,8 +127,9 @@ function Profile() {
       console.error('Error updating user profile image', error);
     }
   };
-
-  if (user === null) {
+  if (loading) {
+    <div className="content-container">Loading...</div>
+  } else if (user === null) {
     return (
       <div>
         <div>
@@ -136,13 +139,9 @@ function Profile() {
           <h1>Not logged in</h1>
         </div>
       </div>);
-  }
-  else {
+  } else {
     return (
       <div>
-        <div>
-          <Navbar />
-        </div>
         <div className="content-container">
           {profileImage && <img src={profileImage} alt="Profile" className="profilelarge"/>}
           <></>
@@ -160,9 +159,11 @@ function Feed() {
   const [userType, setUserType] = useState(null); // TODO: Use this to determine what to show on the feed
   const [documents, setDocuments] = useState([]);
   const [oppositeType, setOppositeType] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   // Listener that checks if a user is logged in
   useEffect(() => {
+    setLoading(true);
     // console.log("Auth state changed:", user);
     const unsubscribe = auth.onAuthStateChanged(async user => {
       if (user) {
@@ -188,6 +189,7 @@ function Feed() {
       } else {
         setUser(null);
       }
+      setLoading(false);
     });
 
     // Cleanup the subscription
@@ -207,7 +209,9 @@ function Feed() {
   }, [userType !== null]);
 
   //If a user is not logged in, don't show users
-  if (user === null) {
+  if (loading) {
+    return <div className="content-container">Loading...</div>;
+  } else if (user === null) {
     return (
       <div>
         <div>
@@ -217,13 +221,9 @@ function Feed() {
           <h1>Not logged in</h1>
         </div>
       </div>);
-  }
-  else {
+  } else {
     return (
       <div>
-        <div>
-          <Navbar />
-        </div>
         <div className="content-container">
           <h1>
             {oppositeType + " In Your Area"}
@@ -319,7 +319,6 @@ function ProfilePage() {
 
   return (
     <div>
-      <Navbar />
       <div className="content-container">
         <h1>{"Venue's Name: " + otherData.name}</h1>
         <p>{"Venue's email: " + otherData.email}</p>
@@ -362,9 +361,6 @@ function Signin() {
   return (
     // TODO: forward errors to the user eg. "Invalid email/password combination"
     <div>
-      <div>
-        <Navbar />
-      </div>
       <div className="content-container">
         <h2 className={"App-header"}>Log in</h2>
         <form onSubmit={handleSubmit}>
@@ -439,9 +435,6 @@ function Signup() {
 
   return (
     <div>
-      <div>
-        <Navbar />
-      </div>
       <div className="content-container">
         <h2 className={"App-header"}>Create an Account</h2>
         <form onSubmit={handleSubmit}>
