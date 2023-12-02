@@ -30,7 +30,8 @@ function App() {
         <Route path={"/signin"} element={<Signin/>} />
         <Route path={"/feed"} element={<Feed/>} />
         <Route path={"/profile"} element={<Profile/>} />
-        <Route path={"/users/:otherId"} element={<ProfilePage />} />
+        <Route path={"/venues/:otherId"} element={<VenuePage />} />
+        <Route path={"/bands/:otherId"} element={<BandPage />} />
       </Routes>
     </Router>
   );
@@ -143,11 +144,11 @@ function Profile() {
     return (
       <div>
         <div className="content-container">
-          {profileImage && <img src={profileImage} alt="Profile" className="profilelarge"/>}
-          <></>
-          <p>Change profile photo:<input type="file" onChange={handleFileChange} /></p>
-          <p>Name: {name}</p>
-          <p>Email: {user.email}</p>
+          <h1>My Profile</h1>
+          {profileImage && <img src={profileImage} alt="Profile Image" className="profilelarge"/>}
+          <p>Edit profile image:<input type="file" onChange={handleFileChange} style={{ marginTop: '1px' }}/></p>
+          <p>My Name: {name}</p>
+          <p>My Email: {user.email}</p>
         </div>
       </div>
     );
@@ -214,9 +215,6 @@ function Feed() {
   } else if (user === null) {
     return (
       <div>
-        <div>
-          <Navbar />
-        </div>
         <div className="content-container">
           <h1>Not logged in</h1>
         </div>
@@ -226,13 +224,15 @@ function Feed() {
       <div>
         <div className="content-container">
           <h1>
-            {oppositeType + " In Your Area"}
+            {oppositeType + " In My Area"}
           </h1>
           {documents.filter(doc => doc.entity_type !== userType).map(doc => (
-            <div key={doc.id} className="card">
-                {/* {doc.entity_name} */}
-                <Link to={`/users/:${doc.id}`}>{doc.entity_name}</Link>
-            </div>
+            <Link to={`/venues/:${doc.id}`} key={doc.id} className="card custom-link">
+              {/* The entire card is now a link */}
+              <div>
+                {doc.entity_name}
+              </div>
+            </Link>
           ))}
         </div>
       </div>
@@ -240,11 +240,12 @@ function Feed() {
   }
 }
 
-function ProfilePage() {
+function VenuePage() {
   const { otherId } = useParams();  // get the param from the url
   const [otherData, setOtherData] = useState(null);
   const [user, setUser] = useState(null);
-  const [userType, setUserType] = useState(null); // TODO: Use this to determine what to show on the feed
+  const [bandDetails, setBandDetails] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchOtherData = async () => {
@@ -278,7 +279,6 @@ function ProfilePage() {
         try {
           const userDoc = await getDoc(userRef);
           if (userDoc.exists()) {
-            setUserType(userDoc.data().accountType);
             console.log('USERTYPE = ', userDoc.data().accountType)
           } else {
             console.log('User document not found');
@@ -294,6 +294,32 @@ function ProfilePage() {
     // Cleanup the subscription
     return () => unsubscribe();
   }, [db]);
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchBandDetails = async () => {
+      const bands = [];
+      for (const id of otherData.visited) {
+        const bandRef = doc(db, 'users', id);
+        try {
+          const bandDoc = await getDoc(bandRef);
+          if (bandDoc.exists()) {
+            bands.push({ id: id, name: bandDoc.data().name, profileImage: bandDoc.data().profileImage });
+          } else {
+            console.log('No such band!');
+          }
+        } catch (error) {
+          console.error('Error fetching band data:', error);
+        }
+      }
+      setBandDetails(bands);
+      setLoading(false);
+    };
+  
+    if (otherData && otherData.visited) {
+      fetchBandDetails();
+    }
+  }, [otherData, db]);
 
   const addToVisited = async () => {
     if (!user) {
@@ -311,6 +337,92 @@ function ProfilePage() {
     }
   }
 
+  if (!otherData || loading) {
+    return <div className="content-container">Loading...</div>;
+  }
+
+  console.log('visited: ', otherData.visited);
+
+  return (
+    <div>
+      <div className="content-container">
+        <h1>{"Venue: " + otherData.name}</h1>
+        <p>{"Venue's email: " + otherData.email}</p>
+        <p>Bands that have played here:</p>
+        <div className="cards-container">
+          {bandDetails.map((band, index) => (
+            <div key={index} className="band-card">
+              <Link to={`/bands/:${band.id}`} className="band-link">
+                <div className="band-info">
+                  <span className="band-name">{band.name}</span>
+                  {band.profileImage && 
+                    <img src={band.profileImage} alt={`${band.name}`} className="profilesmall" />
+                  }
+                </div>
+              </Link>
+            </div>
+          ))}
+        </div>
+        <button onClick={addToVisited} style={{ marginLeft: '10px' }}>Our Band Has Played Here!</button>
+        {/* You can conditionally display band or venue-specific information based on userData.accountType */}
+      </div>
+    </div>
+  );
+}
+
+function BandPage() {
+  const { otherId } = useParams();  // get the param from the url
+  const [otherData, setOtherData] = useState(null);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchOtherData = async () => {
+      try {
+        const docRef = doc(db, 'users', otherId.slice(1));
+        const docSnap = await getDoc(docRef);
+
+        console.log("docSnap = ", docSnap);
+        console.log("otherId = ", otherId);
+
+        if (docSnap.exists()) {
+          setOtherData(docSnap.data());
+        } else {
+          console.log("No such user!");
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchOtherData();
+  }, [otherId, db]);
+
+  // Listener that checks if a user is logged in
+  useEffect(() => {
+    // console.log("Auth state changed:", user);
+    const unsubscribe = auth.onAuthStateChanged(async user => {
+      if (user) {
+        setUser(user);
+        const userRef = doc(db, 'users', user.uid);
+        try {
+          const userDoc = await getDoc(userRef);
+          if (userDoc.exists()) {
+            console.log('USERTYPE = ', userDoc.data().accountType)
+          } else {
+            console.log('User document not found');
+          }
+        } catch (error) {
+          console.error('Error fetching user document:', error);
+        }
+      } else {
+        setUser(null);
+      }
+    });
+
+    // Cleanup the subscription
+    return () => unsubscribe();
+  }, [db]);
+
   if (!otherData) {
     return <div>Loading...</div>;
   }
@@ -320,18 +432,8 @@ function ProfilePage() {
   return (
     <div>
       <div className="content-container">
-        <h1>{"Venue's Name: " + otherData.name}</h1>
-        <p>{"Venue's email: " + otherData.email}</p>
-        <p>Bands that have played here:</p>
-        <ul>
-          {otherData.visited.map((id, index) => (
-            <li key={index}>
-              <Link to={`/users/:${id}`}>{id}</Link> {/* Removed the colon in the URL */}
-            </li>
-          ))}
-        </ul>
-        <button onClick={addToVisited} style={{ marginLeft: '10px' }}>I've played here!</button>
-        {/* You can conditionally display band or venue-specific information based on userData.accountType */}
+        <h1>{"Band's Name: " + otherData.name}</h1>
+        <p>{"Band's email: " + otherData.email}</p>
       </div>
     </div>
   );
@@ -374,7 +476,7 @@ function Signin() {
           </div>
           <div>
             <input
-                type="text"
+                type="password"
                 placeholder="Password"
                 value={password}  // TODO: Make it so that this is hidden
                 onChange={(e) => setPassword(e.target.value)}

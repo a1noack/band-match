@@ -99,6 +99,16 @@ input[type="email"] {
   font-size: 14px;
 }
 
+.custom-link {
+  color: black; /* Set your preferred color */
+  text-decoration: none; /* Removes underline */
+}
+
+.custom-link:hover {
+  color: purple; /* Color on hover */
+  text-decoration: none; /* Adds underline on hover, if desired */
+}
+
 .card {
   background-color: #f9f9f9; /* Light gray background */
   padding: 20px;
@@ -119,4 +129,50 @@ input[type="email"] {
   height: 100px;
   /* margin-right: 20px;
   margin-top: 10px; */
+}
+
+.profilesmall {
+  width: 40px;
+  height: 40px;
+  margin-left: 20px;
+  /* margin-top: 10px; */
+  border-radius: 50%; /* Makes the image circular */
+}
+
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Adjust as needed */
+  gap: 10px;
+  padding: 10px;
+}
+
+.band-card {
+  background-color: #f5f5f5; /* Light gray background, or choose your color */
+  border: 1px solid #ddd; /* A light border */
+  border-radius: 4px; /* Rounded corners */
+  padding: 10px;
+  /* text-align: center;  */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: adds shadow for depth */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.band-info {
+  display: flex;
+  align-items: center;
+}
+
+.band-name {
+  /* Style for the band name */
+  margin-right: 10px; /* Adds some space between the name and the image */
+}
+
+.band-link {
+  color: inherit; /* Inherits the color from the band-card */
+  text-decoration: none; /* Removes underline */
+}
+
+.band-link:hover {
+  color: purple; /* Color change on hover */
 }
