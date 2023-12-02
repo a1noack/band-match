@@ -42,6 +42,7 @@ function Profile() {
   const [name, setName] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   const storage = getStorage();
 
   useEffect(() => {
@@ -128,6 +129,18 @@ function Profile() {
       console.error('Error updating user profile image', error);
     }
   };
+
+  const handleLogout = () => {
+    auth.signOut()
+      .then(() => {
+        console.log("User logged out");
+        navigate("/signin");
+      })
+      .catch(error => {
+        console.error("Error logging out:", error);
+      });
+  };
+                
   if (loading) {
     <div className="content-container">Loading...</div>
   } else if (user === null) {
@@ -145,6 +158,7 @@ function Profile() {
       <div>
         <div className="content-container">
           <h1>My Profile</h1>
+          <button onClick={handleLogout}>Log Out</button>
           {profileImage && <img src={profileImage} alt="Profile Image" className="profilelarge"/>}
           <p>Edit profile image:<input type="file" onChange={handleFileChange} style={{ marginTop: '1px' }}/></p>
           <p>My Name: {name}</p>
