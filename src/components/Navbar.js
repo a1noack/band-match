@@ -1,24 +1,23 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Link } from 'react-router-dom';
-import { db, auth } from "../firebase";
+import { db, auth } from "../utils/firebaseConfig";
 import './Navbar.css';
 import 'font-awesome/css/font-awesome.min.css';
-import defaultProfileImage from '../defaultProfileImage.png';
 import { getDoc, doc } from 'firebase/firestore';
-import logo from '../bandmatch.png'; // Import the logo image
+import logo from '../assets/bandmatch.png'; // Import the logo image
+import defaultProfileImage from '../assets/defaultProfileImage.png';
+import { useAuthState } from '../hooks/useAuthState';
 
 
 const Navbar = () => {
   const [showNavbar, setShowNavbar] = useState(false)
-  const [user, setUser] = useState(null);
+  const { user } = useAuthState();  // Get info for currently logged in user
   const [profileImage, setProfileImage] = useState(null);
-
 
   // Listener that checks if a user is logged in
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async user => {
       if (user) {
-        setUser(user);
         const userRef = doc(db, 'users', user.uid);
         try {
           const userDoc = await getDoc(userRef);
@@ -39,8 +38,9 @@ const Navbar = () => {
         } catch (error) {
           console.error('Error fetching user document:', error);
         }
-      } else {
-        setUser(null);
+      }
+      else {
+        setProfileImage(null);  // Make sure that 
       }
     });
 
@@ -91,4 +91,4 @@ const Navbar = () => {
   )
 }
 
-export default Navbar
+export default Navbar;
