@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendSignInLinkToEmail } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
 import { doc, setDoc } from "firebase/firestore";
 
@@ -19,19 +19,20 @@ function SignUp() {
     };
   
     const navigate = useNavigate();
-  
+
     const handleSubmit = async (event) => {
       event.preventDefault()
       try {
         // Create a new user
-        const { user } = await createUserWithEmailAndPassword(auth, email, password)
+        const { user } = await createUserWithEmailAndPassword(auth, email, password);
+        
         navigate("/feed");
   
         // Add the user's info to the database
         await setDoc(doc(db, "users", user.uid), {
           name: name,
           email: email,
-          accountType: accountType,
+          accountType: "band",
           location: location,
           profileImage: null,
           visited: []
@@ -50,10 +51,10 @@ function SignUp() {
     return (
       <div>
         <div className="content-container">
-          <h2 className={"App-header"}>Create an Account</h2>
+          <h2 className={"App-header"}>Create an account</h2>
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>Name of band or venue</label>
+              <label>Name of individual/group</label>
               <input
                   id="name"
                   type="text"
@@ -80,8 +81,8 @@ function SignUp() {
                   onChange={(e) => setPassword(e.target.value)}
               />
             </div>
-            <label>Account type</label>
-            <div className="radio-group">
+            {/* <label>Account type</label> */}
+            {/* <div className="radio-group">
               <input 
                   type="radio" 
                   id="band" 
@@ -100,7 +101,7 @@ function SignUp() {
                   onChange={handleRadioChange}
                    />
               <label for="venue">Venue</label>
-            </div>
+            </div> */}
             <div className="form-group">
               <label>Location</label>
               <input
