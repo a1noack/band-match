@@ -8,6 +8,7 @@ import VenuePage from './pages/VenuePage';
 import BandPage from "./pages/BandPage";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
+import AddVenue from "./pages/AddVenue";
 
 
 function App() {
@@ -18,8 +19,9 @@ function App() {
         <Route path={"/"} element={<SignUp/>} />
         <Route path={"/signin"} element={<SignIn/>} />
         <Route path={"/feed"} element={<Feed/>} />
+        <Route path={"/addvenue"} element={<AddVenue/>} />
         <Route path={"/profile"} element={<Profile/>} />
-        <Route path={"/venues/:otherId"} element={<VenuePage />} />
+        <Route path={"/venues/:venueName"} element={<VenuePage />} />
         <Route path={"/bands/:otherId"} element={<BandPage />} />
       </Routes>
     </Router>

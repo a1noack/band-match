@@ -1,18 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { useAuthState } from '../hooks/useAuthState';
-import { fetchDocuments } from '../utils/firebaseUtils';
+import { fetchVenueNames } from '../utils/firebaseUtils';
 
 function Feed() {
     const { user, loading, userType } = useAuthState();  // Get info for currently logged in user
     const [documents, setDocuments] = useState([]);
+    const navigate = useNavigate();
+
+    const redirectToVenueAdd = () => {
+        navigate("/addvenue");
+    }
     
     // Get all of the documents for all users
     useEffect(() => {
         const getAndSetDocuments = async () => {
             try {
-            const docs = await fetchDocuments();
+            const docs = await fetchVenueNames();
             setDocuments(docs);
             } catch (error) {
                 console.error("Error fetching documents:", error);
@@ -35,14 +41,16 @@ function Feed() {
             <h1>
                 {"Venues In My Area"}
             </h1>
-            {documents.filter(doc => doc.entity_type !== userType).map(doc => (
-                <Link to={`/venues/:${doc.id}`} key={doc.id} className="card custom-link">
+            {documents.map(doc => (
+                <Link to={`/venues/:${doc.venue_name}`} key={doc.venue_name} className="card custom-link">
                 {/* The entire card is now a link */}
                 <div>
-                    {doc.entity_name}
+                    {doc.venue_name}
                 </div>
                 </Link>
             ))}
+            <div>Don't see a venue that should be listed?</div>
+            <button onClick={redirectToVenueAdd}>Add a venue</button>
             </div>
         </div>
         );

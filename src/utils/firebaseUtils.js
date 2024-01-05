@@ -56,3 +56,13 @@ export const fetchDocuments = async () => {
     return documents;
 }
 
+export const fetchVenueNames = async () => {
+    const querySnapshot = await getDocs(collection(db, "venues"));
+
+    const names = querySnapshot.docs.map((doc) => ({
+        venue_name: doc.data().name,
+    }));
+    console.log(names);
+    return names;
+}
+

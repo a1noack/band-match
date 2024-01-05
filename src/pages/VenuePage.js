@@ -7,7 +7,7 @@ import { useAuthState } from '../hooks/useAuthState';
 
 
 function VenuePage() {
-    const { otherId } = useParams();  // get the param from the url
+    const { venueName } = useParams();  // get the param from the url (must match what's in App.js)
     const [otherData, setOtherData] = useState(null);
     const { user } = useAuthState();  // Get info for currently logged in user
     const [bandDetails, setBandDetails] = useState([]);
@@ -16,11 +16,12 @@ function VenuePage() {
     useEffect(() => {
       const fetchOtherData = async () => {
         try {
-          const docRef = doc(db, 'users', otherId.slice(1));
+          console.log("venuename", venueName);
+          const docRef = doc(db, 'venues', venueName.slice(1));  // Remove the leading colon from the name
           const docSnap = await getDoc(docRef);
-  
+
           console.log("docSnap = ", docSnap);
-          console.log("otherId = ", otherId);
+          console.log("venueName = ", venueName);
   
           if (docSnap.exists()) {
             setOtherData(docSnap.data());
@@ -33,7 +34,7 @@ function VenuePage() {
       };
   
       fetchOtherData();
-    }, [otherId, db]);
+    }, [venueName, db]);
   
     useEffect(() => {
       setLoading(true);
@@ -66,7 +67,7 @@ function VenuePage() {
         console.error("No user logged in");
         return;
       }
-      const otherRef = doc(db, 'users', otherId.slice(1)); // Ensure the ID is correctly formatted
+      const otherRef = doc(db, 'venues', venueName.slice(1));  // Remove the leading colon from the name
       try {
         await updateDoc(otherRef, {
           visited: arrayUnion(user.uid)
@@ -86,8 +87,8 @@ function VenuePage() {
     return (
       <div>
         <div className="content-container">
-          <h1>{"Venue: " + otherData.name}</h1>
-          <p>{"Venue's email: " + otherData.email}</p>
+          <h1>{otherData.name}</h1>
+          <p>{"Description: " + otherData.description}</p>
           <p>Bands that have played here:</p>
           <div className="cards-container">
             {bandDetails.map((band, index) => (
