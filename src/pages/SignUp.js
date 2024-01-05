@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { createUserWithEmailAndPassword, sendSignInLinkToEmail } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
 import { doc, setDoc } from "firebase/firestore";
 
@@ -11,12 +11,7 @@ function SignUp() {
     const [password, setPassword] = useState("");
     const [name, setName] = useState("");
     const [location, setLocation] = useState("");
-    const [accountType, setAccountType] = useState('band');
     const [error, setError] = useState(null);
-  
-    const handleRadioChange = (e) => {
-      setAccountType(e.target.value);
-    };
   
     const navigate = useNavigate();
 
@@ -32,6 +27,7 @@ function SignUp() {
         await setDoc(doc(db, "users", user.uid), {
           name: name,
           email: email,
+          description: null,
           accountType: "band",
           location: location,
           profileImage: null,
