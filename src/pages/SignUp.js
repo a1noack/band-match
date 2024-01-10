@@ -50,7 +50,7 @@ function SignUp() {
           <h2 className={"App-header"}>Create an account</h2>
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label>Name of individual/group</label>
+              <label for="name">Name of individual/group</label>
               <input
                   id="name"
                   type="text"
@@ -60,8 +60,9 @@ function SignUp() {
               />
             </div>
             <div className="form-group">
-              <label>Email address</label>
+              <label for="email">Email address</label>
               <input
+                  id="email"
                   type="text"
                   placeholder=""
                   value={email}
@@ -69,8 +70,9 @@ function SignUp() {
               />
             </div>
             <div className="form-group">
-              <label>Password</label>
+              <label for="password">Password</label>
               <input
+                  id="password"
                   type="password"
                   placeholder=""
                   value={password}
@@ -99,19 +101,19 @@ function SignUp() {
               <label for="venue">Venue</label>
             </div> */}
             <div className="form-group">
-              <label>Location</label>
+              <label for="location">Location</label>
               <input
+                  id="location"
                   type="text"
                   placeholder=""
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
               />
             </div>
-            <button type="submit">Submit</button>
-            <div className="form-group">
-              <p>Already have an account?</p> 
-            </div>
-            <button onClick={redirectToLogin}>Log in</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <br /><br />
+            <div>Already have an account?</div>
+            <button class="btn" onClick={redirectToLogin}>Log in</button>
           </form>
           {
             error &&
