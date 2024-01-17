@@ -9,3 +9,5 @@ export const LOCATION_REQUIRED = "Please select valid location from the list";
 export const INVALID_EMAIL = "Please enter a valid email address";
 
 export const INVALID_PASSWORD = "Please enter at least 6 characters";
+
+export const PASSWORD_MISMATCH = "Password and confirm password must match";

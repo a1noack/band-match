@@ -17,12 +17,14 @@ import {
   INVALID_PASSWORD,
   LOCATION_REQUIRED,
   NAME_REQUIRED,
+  PASSWORD_MISMATCH,
 } from "../utils/messages";
 import { emailValidation, passwordCheck } from "../utils/regex";
 
 function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
   const [geometry, setGeometry] = useState(null);
@@ -38,7 +40,8 @@ function SignUp() {
         !name ||
         !geometry ||
         !emailValidation(email) ||
-        !passwordCheck(password)
+        !passwordCheck(password) ||
+        password !== confirmPassword
       ) {
         setErr((err) => ({
           ...err,
@@ -46,6 +49,8 @@ function SignUp() {
           location: geometry ? "" : LOCATION_REQUIRED,
           email: emailValidation(email) ? "" : INVALID_EMAIL,
           password: passwordCheck(password) ? "" : INVALID_PASSWORD,
+          confirmPassword:
+            password === confirmPassword ? "" : PASSWORD_MISMATCH,
         }));
         return;
       }
@@ -139,10 +144,32 @@ function SignUp() {
                         password: passwordCheck(e.target.value)
                           ? ""
                           : INVALID_PASSWORD,
+                        confirmPassword: confirmPassword
+                          ? confirmPassword === e.target.value
+                            ? ""
+                            : PASSWORD_MISMATCH
+                          : err.confirmPassword || "",
                       }));
                     }}
                     errorMessage={err.password}
                   />
+
+                  <BMInput
+                    label="Confirm Password"
+                    type="password"
+                    placeholder="Re enter your password"
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      setErr((err) => ({
+                        ...err,
+                        confirmPassword:
+                          e.target.value === password ? "" : PASSWORD_MISMATCH,
+                      }));
+                    }}
+                    errorMessage={err.confirmPassword}
+                  />
+
                   <BMAddressInput
                     onPlaceSelected={(e) => {
                       setLocation(e.formatted_address);
