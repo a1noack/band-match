@@ -1,28 +1,28 @@
+import "font-awesome/css/font-awesome.min.css";
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import './styles/App.css';
-import Feed from './pages/Feed';
-import Profile from './pages/Profile';
-import VenuePage from './pages/VenuePage';
-import BandPage from "./pages/BandPage";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import { useAuthState } from "./hooks/useAuthState";
+import AddVenue from "./pages/AddVenue";
+import Feed from "./pages/Feed";
+import Profile from "./pages/Profile";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
-import AddVenue from "./pages/AddVenue";
-
+import VenuePage from "./pages/VenuePage";
+import "./styles/App.scss";
 
 function App() {
+  const { user } = useAuthState();
   return (
     <Router>
-      <Navbar/>
+      {user && <Navbar />}
       <Routes>
-        <Route path={"/"} element={<SignUp/>} />
-        <Route path={"/signin"} element={<SignIn/>} />
-        <Route path={"/feed"} element={<Feed/>} />
-        <Route path={"/addvenue"} element={<AddVenue/>} />
-        <Route path={"/profile"} element={<Profile/>} />
+        <Route path={"/"} element={<SignUp />} />
+        <Route path={"/signin"} element={<SignIn />} />
+        <Route path={"/feed"} element={<Feed />} />
+        <Route path={"/addvenue"} element={<AddVenue />} />
+        <Route path={"/profile"} element={<Profile />} />
         <Route path={"/venues/:venueName"} element={<VenuePage />} />
-        <Route path={"/bands/:otherId"} element={<BandPage />} />
       </Routes>
     </Router>
   );
