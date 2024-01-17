@@ -213,6 +213,7 @@ h1,h2,h3,h4,h5,h6 {
   }
   .profile-icon {
     position: absolute;
+    cursor: pointer;
     right: 10px;
     bottom: 10px;
     overflow: hidden;
@@ -221,20 +222,25 @@ h1,h2,h3,h4,h5,h6 {
       visibility: hidden;
       position: absolute;
     }
-    label {
-      background: linear-gradient(to right, $primary 0%, $secondary 100%);
-      width: 30px;
-      height: 30px;
-      border-radius: 100%;
-      color: #fff;
-      cursor: pointer;
-      line-height: 30px;
-    }
   }
   &.no-image {
     img {
       padding: 20px;
     }
+  }
+}
+.profile-icon {
+  label {
+    background: linear-gradient(to right, $primary 0%, $secondary 100%);
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
+    color: #fff;
+    cursor: pointer;
+    line-height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 .band-play-wrapper {

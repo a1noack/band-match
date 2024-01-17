@@ -13,6 +13,7 @@ import BMContainer from "../shared/BMContainer";
 import BMRow from "../shared/BMRow";
 import BMSlider from "../shared/BMSlider";
 import BMSpinner from "../shared/BMSpinner";
+import Icon from "../components/venues/Icon";
 
 function VenuePage() {
   const { venueName } = useParams(); // get the param from the url (must match what's in App.js)
@@ -20,6 +21,7 @@ function VenuePage() {
   const { user } = useAuthState(); // Get info for currently logged in user
   const [bandDetails, setBandDetails] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
     const fetchOtherData = async () => {
@@ -89,7 +91,6 @@ function VenuePage() {
       console.error("Error updating visited array", error);
     }
   };
-
   if (!otherData || loading) {
     return (
       <BMContainer>
@@ -109,7 +110,30 @@ function VenuePage() {
                 <i className="fa fa-map-marker me-2"></i>
                 {otherData.location}
               </p>
-              <p>{"Description: " + otherData.description}</p>
+
+              <div>
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                  <b>Description</b>
+                  {!editing ? (
+                    <Icon
+                      className="fa-pencil"
+                      onClick={() => setEditing(true)}
+                    />
+                  ) : (
+                    <>
+                      <Icon
+                        className="fa-check"
+                        onClick={() => setEditing(false)}
+                      />
+                      <Icon
+                        className="fa-close"
+                        onClick={() => setEditing(false)}
+                      />
+                    </>
+                  )}
+                </div>
+                <p>{otherData.description}</p>
+              </div>
             </div>
           </BMCol>
           <BMCol lg={7}>
