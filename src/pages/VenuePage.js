@@ -6,14 +6,15 @@ import { db } from "../utils/firebaseConfig";
 import { SwiperSlide } from "swiper/react";
 import noImage from "../assets/no-image.jpg";
 import Map from "../components/MapPreview";
+import Icon from "../components/venues/Icon";
 import { useAuthState } from "../hooks/useAuthState";
 import BMButton from "../shared/BMButton";
 import BMCol from "../shared/BMCol";
 import BMContainer from "../shared/BMContainer";
+import BMInput from "../shared/BMInput";
 import BMRow from "../shared/BMRow";
 import BMSlider from "../shared/BMSlider";
 import BMSpinner from "../shared/BMSpinner";
-import Icon from "../components/venues/Icon";
 
 function VenuePage() {
   const { venueName } = useParams(); // get the param from the url (must match what's in App.js)
@@ -21,6 +22,7 @@ function VenuePage() {
   const { user } = useAuthState(); // Get info for currently logged in user
   const [bandDetails, setBandDetails] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [updateDescriptionData, setUpdateDescriptionData] = useState("");
   const [editing, setEditing] = useState(false);
 
   useEffect(() => {
@@ -35,6 +37,7 @@ function VenuePage() {
 
         if (docSnap.exists()) {
           setOtherData(docSnap.data());
+          setUpdateDescriptionData(docSnap.data().description);
         } else {
           console.log("No such user!");
         }
@@ -91,6 +94,29 @@ function VenuePage() {
       console.error("Error updating visited array", error);
     }
   };
+
+  const updateDescription = async () => {
+    if (!user) {
+      console.error("No user logged in");
+      return;
+    }
+    const otherRef = doc(db, "venues", otherData.name);
+    // Remove the leading colon from the name
+    try {
+      await updateDoc(otherRef, {
+        description: updateDescriptionData,
+      });
+      setOtherData((data) => ({
+        ...data,
+        description: updateDescriptionData,
+      }));
+      setUpdateDescriptionData("");
+      setEditing(false);
+    } catch (error) {
+      console.error("Error updating visited array", error);
+    }
+  };
+
   if (!otherData || loading) {
     return (
       <BMContainer>
@@ -117,22 +143,34 @@ function VenuePage() {
                   {!editing ? (
                     <Icon
                       className="fa-pencil"
-                      onClick={() => setEditing(true)}
+                      onClick={() => {
+                        setEditing(true);
+                        setUpdateDescriptionData(otherData.description);
+                      }}
                     />
                   ) : (
                     <>
-                      <Icon
-                        className="fa-check"
-                        onClick={() => setEditing(false)}
-                      />
+                      <Icon className="fa-check" onClick={updateDescription} />
                       <Icon
                         className="fa-close"
-                        onClick={() => setEditing(false)}
+                        onClick={() => {
+                          setEditing(false);
+                          setUpdateDescriptionData("");
+                        }}
                       />
                     </>
                   )}
                 </div>
-                <p>{otherData.description}</p>
+                {!editing ? (
+                  <p>{otherData.description}</p>
+                ) : (
+                  <BMInput
+                    value={updateDescriptionData}
+                    onChange={(e) => setUpdateDescriptionData(e.target.value)}
+                    as="textarea"
+                    rows={3}
+                  />
+                )}
               </div>
             </div>
           </BMCol>

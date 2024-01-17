@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React from "react";
 
 const Icon = ({ className, onClick }) => {
   return (
@@ -10,7 +10,4 @@ const Icon = ({ className, onClick }) => {
   );
 };
 
-export default memo(
-  Icon,
-  (prev, next) => JSON.stringify(prev) === JSON.stringify(next)
-);
+export default Icon;
