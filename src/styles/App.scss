@@ -1,5 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
-@import "bootstrap/scss/functions"; 
+@import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
 
 $primary: #4361ee;
@@ -11,12 +11,13 @@ $input-padding-y: 10px;
 $input-padding-x: 14px;
 $navbar-padding-y: 20px;
 $dark: #1f1f1f;
+$white: #ffffff;
 $theme-colors: (
   "primary": $primary,
   "secondary": $secondary,
-  "danger": $danger
-  );
-  @import 'bootstrap/scss/bootstrap';
+  "danger": $danger,
+);
+@import "bootstrap/scss/bootstrap";
 
 img {
   max-width: 100%;
@@ -25,7 +26,12 @@ a {
   text-decoration: none;
   color: $dark;
 }
-h1,h2,h3,h4,h5,h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin-bottom: 0;
   color: $dark;
 }
@@ -33,17 +39,25 @@ h1,h2,h3,h4,h5,h6 {
   box-shadow: none;
   border-color: $primary;
 }
-.form-control::-webkit-outer-spin-button, .form-control::-webkit-inner-spin-button {
+.form-control::-webkit-outer-spin-button,
+.form-control::-webkit-inner-spin-button {
   -webkit-appearance: none;
   -moz-appearance: textfield;
 }
-.form-control:-webkit-autofill, .form-control:-webkit-autofill:hover, .form-control:-webkit-autofill:focus {
+.form-control:-webkit-autofill,
+.form-control:-webkit-autofill:hover,
+.form-control:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0px 40rem #ffffff inset;
 }
 .btn {
   transition: all 0.5s ease-in-out;
   &-primary {
-    background: linear-gradient(to right, $primary 0%, $secondary 51%, $primary);
+    background: linear-gradient(
+      to right,
+      $primary 0%,
+      $secondary 51%,
+      $primary
+    );
     background-size: 200% 100%;
     border: 0;
   }
@@ -217,7 +231,7 @@ h1,h2,h3,h4,h5,h6 {
     right: 10px;
     bottom: 10px;
     overflow: hidden;
-    input[type=file] {
+    input[type="file"] {
       opacity: 0;
       visibility: hidden;
       position: absolute;
@@ -296,6 +310,9 @@ h1,h2,h3,h4,h5,h6 {
   }
 }
 .venue-detail-img {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
   img {
     height: 550px;
     width: 100%;
@@ -305,14 +322,34 @@ h1,h2,h3,h4,h5,h6 {
       height: auto;
     }
   }
+  &::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 90px;
+    bottom: 0;
+    background: linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.4) 0%,
+      rgba(0, 212, 255, 0) 100%
+    );
+  }
+  .btn-band-list {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+  }
 }
 .venue-detail {
   height: 450px;
   background-color: #fff;
-  box-shadow: 0 0 14px rgba(0,0,0,0.2);
+  box-shadow: 0 0 14px rgba(0, 0, 0, 0.2);
   padding: 20px;
   margin-left: -100px;
   border-radius: 20px;
+  position: relative;
+  z-index: 1;
   @media screen and (max-width: 991px) {
     margin-left: 0;
     margin-bottom: 30px;

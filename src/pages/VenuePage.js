@@ -149,8 +149,12 @@ function VenuePage() {
                       }}
                     />
                   ) : (
-                    <>
-                      <Icon className="fa-check" onClick={updateDescription} />
+                    <div className="d-flex">
+                      <Icon
+                        wrapperClass="me-2"
+                        className="fa-check"
+                        onClick={updateDescription}
+                      />
                       <Icon
                         className="fa-close"
                         onClick={() => {
@@ -158,7 +162,7 @@ function VenuePage() {
                           setUpdateDescriptionData("");
                         }}
                       />
-                    </>
+                    </div>
                   )}
                 </div>
                 {!editing ? (
@@ -177,6 +181,13 @@ function VenuePage() {
           <BMCol lg={7}>
             <div className="venue-detail-img">
               <img src={otherData?.images?.[0] || noImage} alt="venue-img" />
+              <BMButton
+                variant="primary"
+                className="btn-band-list mt-3 mt-sm-0"
+                onClick={addToVisited}
+              >
+                Our Band Has Played Here!
+              </BMButton>
             </div>
           </BMCol>
         </BMRow>
@@ -193,13 +204,6 @@ function VenuePage() {
           <BMCol xs={12}>
             <div className="band-play-wrapper">
               <h2>Band Played List</h2>
-              <BMButton
-                variant="primary"
-                className="btn-band-list mt-3 mt-sm-0"
-                onClick={addToVisited}
-              >
-                Our Band Has Played Here!
-              </BMButton>
             </div>
             {bandDetails.length > 0 ? (
               <div className="band-play-list">

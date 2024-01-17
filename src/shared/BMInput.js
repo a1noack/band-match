@@ -14,7 +14,7 @@ const BMInput = ({
 }) => {
   return (
     <Form.Group className="mb-3 form-group">
-      <Form.Label>{label}</Form.Label>
+      {label && <Form.Label>{label}</Form.Label>}
       <Form.Control
         type={type}
         placeholder={placeholder}
