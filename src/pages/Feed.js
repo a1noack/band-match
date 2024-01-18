@@ -102,8 +102,10 @@ function Feed() {
                   </div>
                 ) : (
                   <div className="no-value-found">
-                    <img src={noVenuesFound} alt="No venues found" />
-                    <p>No venues found</p>
+                    <div className="w-100">
+                      <img src={noVenuesFound} alt="No venues found" />
+                      <p className="fw-bold">No venues found</p>
+                    </div>
                   </div>
                 )}
               </BMCol>
