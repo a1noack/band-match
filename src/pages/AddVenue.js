@@ -2,6 +2,7 @@ import React, { useState } from "react";
 // import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import { uploadToFirebase } from "../utils/firebaseUtils";
+import { GeoPoint } from "@firebase/firestore";
 
 import { doc, setDoc } from "firebase/firestore";
 import BMAddressInput from "../shared/BMAddressInput";
@@ -67,7 +68,7 @@ function AddVenue() {
       console.error("Error updating user profile image", error);
     }
   };
-  console.log(err);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
@@ -86,7 +87,7 @@ function AddVenue() {
         name: name,
         description: description,
         location: location,
-        geometry: [geometry.lat(), geometry.lng()],
+        geometry: new GeoPoint(geometry.lat(), geometry.lng()),
         images: [imageURL],
         visited: [],
       });

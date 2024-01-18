@@ -1,5 +1,5 @@
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import { GeoPoint, doc, setDoc } from "firebase/firestore";
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
@@ -71,7 +71,7 @@ function SignUp() {
         description: null,
         accountType: "band",
         location: location,
-        geometry: [geometry.lat(), geometry.lng()],
+        geometry: new GeoPoint(geometry.lat(), geometry.lng()),
         profileImage: null,
         visited: [],
       });

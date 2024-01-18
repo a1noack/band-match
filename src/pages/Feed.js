@@ -8,10 +8,12 @@ import BMContainer from "../shared/BMContainer";
 import BMRow from "../shared/BMRow";
 import BMSpinner from "../shared/BMSpinner";
 import { fetchVenueNames } from "../utils/firebaseUtils";
+import Map from "../components/MapPreview";
 
 function Feed() {
-  const { user, loading, userType } = useAuthState(); // Get info for currently logged in user
+  const { user, userData, loading } = useAuthState(); // Get info for currently logged in user
   const [documents, setDocuments] = useState([]);
+  const [dataLoading, setDataLoading] = useState(false);
   const navigate = useNavigate();
 
   const redirectToVenueAdd = () => {
@@ -22,17 +24,19 @@ function Feed() {
   useEffect(() => {
     const getAndSetDocuments = async () => {
       try {
-        const docs = await fetchVenueNames();
+        setDataLoading(true);
+        const docs = await fetchVenueNames(userData);
         setDocuments(docs);
+        setDataLoading(false);
       } catch (error) {
         console.error("Error fetching documents:", error);
       }
     };
-    getAndSetDocuments();
-  }, [userType !== null]);
+    if (userData) getAndSetDocuments();
+  }, [userData]);
 
   // If we are still loading the user's information, show loading screen
-  if (loading) {
+  if (loading || dataLoading) {
     return (
       <BMContainer>
         <BMSpinner />
@@ -57,19 +61,38 @@ function Feed() {
             </BMCol>
           </BMRow>
           <BMRow>
-            {documents.map((doc) => (
-              <BMCol md={3} sm={6} xs={12} key={doc.venue_name}>
-                <div className="venue-name">
-                  <Link to={`/venues/:${doc.venue_name}`} className="">
-                    <h6>{doc?.venue_name}</h6>
-                    <p>
-                      <i className="fa fa-map-marker"></i>
-                      {doc?.venue_location}
-                    </p>
-                  </Link>
-                </div>
-              </BMCol>
-            ))}
+            <BMCol xs={12}>
+              <div className="feed-area">
+                <BMRow>
+                  <BMCol md={4}>
+                    <div className="venue-area-list">
+                      {documents.map((doc) => (
+                        <div className="venue-name" key={doc.venue_name}>
+                          <Link to={`/venues/:${doc.venue_name}`} className="">
+                            <h6>{doc?.venue_name}</h6>
+                            <p>
+                              <i className="fa fa-map-marker"></i>
+                              {doc?.venue_location}
+                            </p>
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
+                  </BMCol>
+                  <BMCol md={8}>
+                    <div className="feed-map">
+                      <Map
+                        centerPoint={userData?.geometry}
+                        markerPoints={documents?.map((doc) => ({
+                          geometry: doc.geometry,
+                          name: doc.venue_name,
+                        }))}
+                      />
+                    </div>
+                  </BMCol>
+                </BMRow>
+              </div>
+            </BMCol>
           </BMRow>
         </BMContainer>
       </div>

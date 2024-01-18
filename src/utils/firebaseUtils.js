@@ -6,6 +6,7 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { db } from "./firebaseConfig";
+import { GeoPoint, query, where } from "@firebase/firestore";
 
 export const uploadToFirebase = async (fileToUpload) => {
   const storage = getStorage();
@@ -62,14 +63,36 @@ export const fetchDocuments = async () => {
   return documents;
 };
 
-export const fetchVenueNames = async () => {
-  const querySnapshot = await getDocs(collection(db, "venues"));
+export const fetchVenueNames = async (user) => {
+  const latitude = user?.geometry?._lat;
+  const longitude = user?.geometry?._long;
+  const distance = +process.env.REACT_APP_NEAR_BY_AREA;
+  const lat = 0.0144927536231884;
+  const lon = 0.0181818181818182;
 
-  const names = querySnapshot.docs.map((doc) => ({
+  const lowerLat = latitude - lat * distance;
+  const lowerLon = longitude - lon * distance;
+
+  const greaterLat = latitude + lat * distance;
+  const greaterLon = longitude + lon * distance;
+
+  const lesserGeopoint = new GeoPoint(lowerLat, lowerLon);
+  const greaterGeopoint = new GeoPoint(greaterLat, greaterLon);
+
+  const docRef = collection(db, "venues");
+  const q = query(
+    docRef,
+    where("geometry", ">", lesserGeopoint),
+    where("geometry", "<", greaterGeopoint)
+  );
+
+  const snapshots = await getDocs(q);
+  const names = snapshots.docs.map((doc) => ({
     venue_name: doc.data().name,
     venue_location: doc.data().location,
     venue_image: doc.data().images,
+    geometry: doc.data().geometry,
   }));
-  console.log(names);
+
   return names;
 };

@@ -135,7 +135,7 @@ h6 {
   padding: 20px 10px 20px 15px;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  margin-bottom: 25px;
+  margin: 5px 5px 25px;
   position: relative;
   @media screen and (max-width: 480px) {
     margin-bottom: 15px;
@@ -380,4 +380,24 @@ h6 {
 }
 .no-data {
   color: #999;
+}
+.feed-area {
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  border-radius: 10px;
+  .venue-area-list {
+    max-height: calc(100vh - 284px);
+    overflow-y: auto;
+    @media screen and (max-width: 767px) {
+      max-height: 400px;
+      margin-bottom: 20px;
+    }
+  }
+  .feed-map {
+    min-height: calc(100vh - 284px);
+    display: flex;
+    @media screen and (max-width: 767px) {
+      min-height: 400px;
+    }
+  }
 }

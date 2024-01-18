@@ -191,15 +191,7 @@ function VenuePage() {
             </div>
           </BMCol>
         </BMRow>
-        <BMRow>
-          <BMCol xs={12}>
-            {otherData.geometry && (
-              <div className="location-map">
-                <Map geometry={otherData.geometry} />
-              </div>
-            )}
-          </BMCol>
-        </BMRow>
+
         <BMRow>
           <BMCol xs={12}>
             <div className="band-play-wrapper">
