@@ -80,13 +80,13 @@ export const fetchVenueNames = async (user) => {
   const greaterGeopoint = new GeoPoint(greaterLat, greaterLon);
 
   const docRef = collection(db, "venues");
-  const q = query(
+  const dataQuery = query(
     docRef,
     where("geometry", ">", lesserGeopoint),
     where("geometry", "<", greaterGeopoint)
   );
 
-  const snapshots = await getDocs(q);
+  const snapshots = await getDocs(dataQuery);
   const names = snapshots.docs.map((doc) => ({
     venue_name: doc.data().name,
     venue_location: doc.data().location,

@@ -8,7 +8,7 @@ const BMAddressInput = ({ onPlaceSelected, label, errorMessage }) => {
       <Form.Group className="mb-3 form-group">
         <Form.Label>{label}</Form.Label>
         <GooglePlacesAutocomplete
-          options={{ types: ["geocode"] }}
+          options={{ types: [] }}
           apiKey={process.env.REACT_APP_GOOGLE_API_KEY}
           onPlaceSelected={onPlaceSelected}
           placeholder="Enter your address"

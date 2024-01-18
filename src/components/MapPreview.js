@@ -26,7 +26,11 @@ const Map = ({ centerPoint, markerPoints = [] }) => {
 
   return (
     isLoaded && (
-      <GoogleMap mapContainerStyle={mapContainerStyle} center={center} zoom={8}>
+      <GoogleMap
+        mapContainerStyle={mapContainerStyle}
+        center={center}
+        zoom={10.5}
+      >
         {locations.map((location) => (
           <Marker
             key={location.id}
