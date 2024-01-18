@@ -5,7 +5,6 @@ import { db } from "../utils/firebaseConfig";
 
 import { SwiperSlide } from "swiper/react";
 import noImage from "../assets/no-image.jpg";
-import Map from "../components/MapPreview";
 import Icon from "../components/venues/Icon";
 import { useAuthState } from "../hooks/useAuthState";
 import BMButton from "../shared/BMButton";
@@ -15,6 +14,7 @@ import BMInput from "../shared/BMInput";
 import BMRow from "../shared/BMRow";
 import BMSlider from "../shared/BMSlider";
 import BMSpinner from "../shared/BMSpinner";
+import noVenueDetailsFound from "../assets/no-venue-found.png";
 
 function VenuePage() {
   const { venueName } = useParams(); // get the param from the url (must match what's in App.js)
@@ -24,10 +24,12 @@ function VenuePage() {
   const [loading, setLoading] = useState(true);
   const [updateDescriptionData, setUpdateDescriptionData] = useState("");
   const [editing, setEditing] = useState(false);
+  const [detailsLoading, setDetailsLoading] = useState(false);
 
   useEffect(() => {
     const fetchOtherData = async () => {
       try {
+        setDetailsLoading(true);
         console.log("venuename", venueName);
         const docRef = doc(db, "venues", venueName.slice(1)); // Remove the leading colon from the name
         const docSnap = await getDoc(docRef);
@@ -41,7 +43,9 @@ function VenuePage() {
         } else {
           console.log("No such user!");
         }
+        setDetailsLoading(false);
       } catch (error) {
+        setDetailsLoading(false);
         console.error("Error fetching user data:", error);
       }
     };
@@ -49,7 +53,6 @@ function VenuePage() {
   }, [venueName, db]);
 
   useEffect(() => {
-    setLoading(true);
     const fetchBandDetails = async () => {
       const bands = [];
       for (const id of otherData.visited) {
@@ -75,8 +78,9 @@ function VenuePage() {
     };
 
     if (otherData && otherData.visited) {
+      setLoading(true);
       fetchBandDetails();
-    }
+    } else setLoading(false);
   }, [otherData, db]);
 
   const addToVisited = async () => {
@@ -117,13 +121,26 @@ function VenuePage() {
     }
   };
 
-  if (!otherData || loading) {
+  if (detailsLoading || loading) {
     return (
       <BMContainer>
         <BMSpinner />
       </BMContainer>
     );
   }
+
+  if (!detailsLoading && !otherData)
+    return (
+      <BMContainer>
+        <BMRow>
+          <BMCol xs={12}>
+            <div className="no-value-found">
+              <img src={noVenueDetailsFound} alt="No venue details found" />
+            </div>
+          </BMCol>
+        </BMRow>
+      </BMContainer>
+    );
 
   return (
     <div className="py-md-5 py-4">
